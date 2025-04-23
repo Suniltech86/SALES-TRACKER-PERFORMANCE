@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales Tracker & Performance</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+	  
+    }
+	#login-section {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: green;
+      width: 400px;
+      padding: 30px;
+      text-align: center;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+	label{font-size:20px; 
+	      font-weight:bold;
+		  }
+
+	h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 50px;
+      background-color:#f9f9f9;
+      box-shadow:0 4px 8px rgba(0, 0, 0, 0.2);
+	 
+    }
+    .form-container {
+      margin-bottom: 30px;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    input[type="password"]	{
+      padding: 8px;
+      font-size: 16px;
+      margin: 10px 0;
+      width: 200px;
+    }
+    select {
+      padding: 8px;
+      font-size: 16px;
+      margin: 10px 0;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: blue;
+	  border-radius:20px;
+	  font-size:20px;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      transform:scale(0.9);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+    }
+    .rating-excellent {
+      color: green;
+    }
+    .rating-good {
+      color: orange;
+    }
+    .rating-poor {
+      color: red;
+    }
+    .rating-bad {
+      color: red;
+    }
+    .total-sales, .average-sales, .sales-count {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .logout-btn {
+      margin: 20px;
+      padding: 10px 20px;
+      background-color:red;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .logout-btn:hover {
+      background-color: #e53935;
+    }
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      table {
+        font-size: 14px;
+      }
+    </style>
+</head>
+<body>
+  <div id="login-section" >
+
+    <h1>Admin Login</h1>
+	<label>Enter Username</label><br>
+    <input type="text" id="username" placeholder="Username" /><br>
+    <label>Password</label><br>
+    <input type="password" id="password" placeholder="Password" /><br>
+    <button id="login-btn">Login</button>
+  </div>
+
+  <div id="sales-section" style="display:none">
+    <div class="container">
+	
+
+      <h1>Sales Tracker & Performance</h1>
+
+     <button id="logout-btn" class="logout-btn" style="display:none">Logout</button>
+
+      <div>
+        <input type="text" id="filter-employee-id" placeholder="Filter by Employee ID" />
+        <button id="filter-sales">Filter Sales</button>
+        <div class="sales-count" id="sales-count">
+          Total Sales for Selected Employee: 0
+        </div>
+      </div>
+
+      <div class="form-container">
+        <input type="text" id="employee-name" placeholder="Employee Name" required />
+        <input type="text" id="employee-id" placeholder="Employee ID" required />
+        <input type="date" id="sale-date" required />
+        <select id="store-id">
+          <option value="">Select Store ID</option>
+          <option value="1">INAPVSK0000A</option>
+          <option value="2">INTGHYD0000B</option>
+          <option value="3">INTNVLR0000C</option>
+          <option value="4">INKABLR0000D</option>
+        </select>
+        <input type="number" id="sales-amount" placeholder="Sales Amount" required />
+        <button id="add-sales">Add Sales</button>
+      </div>
+
+      <table id="sales-table">
+        <thead>
+          <tr>
+            <th>Employee Name</th>
+            <th>Employee ID</th>
+            <th>Date of Sale</th>
+            <th>Store ID</th>
+            <th>Sales Amount</th>
+            <th>Performance Rating</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+
+      <div class="total-sales" id="total-sales">
+        Total Sales: &#8377;0
+      </div>
+      <div class="average-sales" id="average-sales">
+        Average Sales per Employee: &#8377;0
+      </div>
+
+     <button id="download-csv">Download CSV</button>
+    </div>
+  </div>
+
+  <script>
+    const salesData = [];
+
+    document.getElementById('login-btn').addEventListener('click', function () {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      if (username === '' && password === '') {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('sales-section').style.display = 'block';
+        document.getElementById('logout-btn').style.display = 'inline-block';
+		document.getElementById('scroll').style.display='none';
+      } else {
+        alert('Invalid credentials, please try again.');
+      }
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', function () {
+      document.getElementById('login-section').style.display = 'block';
+      document.getElementById('sales-section').style.display = 'none';
+      document.getElementById('logout-btn').style.display = 'none';
+      document.getElementById('scroll').style.display='block';
+	});
+
+    document.getElementById('add-sales').addEventListener('click', function () {
+      const name = document.getElementById('employee-name').value;
+      const id = document.getElementById('employee-id').value;
+      const date = document.getElementById('sale-date').value;
+      const storeId = document.getElementById('store-id').value;
+      const sales = parseFloat(document.getElementById('sales-amount').value);
+
+      if (name && id && date && storeId && sales >= 0) {
+        const newSale = {
+          name,
+          id,
+          date,
+          storeId,
+          sales,
+          performance: getPerformanceRating(sales),
+        };
+        salesData.push(newSale);
+        updateSalesTable();
+        updateTotalSales();
+        updateAverageSales();
+        clearFormFields();
+      } else {
+        alert('Please fill in all fields correctly.');
+      }
+    });
+
+    function getPerformanceRating(sales) {
+      if (sales >= 1000) return 'Excellent';
+      if (sales >= 750) return 'Good';
+      if (sales >= 500) return 'Average';
+      return 'Poor';
+    }
+
+    function updateSalesTable(filteredData = salesData) {
+      const tableBody = document.getElementById('sales-table').getElementsByTagName('tbody')[0];
+      tableBody.innerHTML = '';
+
+      filteredData.forEach((record, index) => {
+        const row = tableBody.insertRow();
+
+        row.insertCell(0).textContent = record.name;
+        row.insertCell(1).textContent = record.id;
+        row.insertCell(2).textContent = record.date;
+        row.insertCell(3).textContent = record.storeId;
+        row.insertCell(4).textContent = `$${record.sales.toFixed(2)}`;
+        row.insertCell(5).textContent = record.performance;
+        row.insertCell(6).innerHTML = `
+          <button onclick="editSale(${index})">Edit</button>
+          <button onclick="deleteSale(${index})">Delete</button>
+        `;
+      });
+    }
+
+    function editSale(index) {
+      const sale = salesData[index];
+      document.getElementById('employee-name').value = sale.name;
+      document.getElementById('employee-id').value = sale.id;
+      document.getElementById('sale-date').value = sale.date;
+      document.getElementById('store-id').value = sale.storeId;
+      document.getElementById('sales-amount').value = sale.sales;
+
+      salesData.splice(index, 1);
+      updateSalesTable();
+      updateTotalSales();
+      updateAverageSales();
+    }
+
+    function deleteSale(index) {
+      salesData.splice(index, 1);
+      updateSalesTable();
+      updateTotalSales();
+      updateAverageSales();
+    }
+
+    function updateTotalSales() {
+      const totalSales = salesData.reduce((total, record) => total + record.sales, 0);
+      document.getElementById('total-sales').textContent = `Total Sales: $${totalSales.toFixed(2)}`;
+    }
+
+    function updateAverageSales() {
+      const totalSales = salesData.reduce((total, record) => total + record.sales, 0);
+      const averageSales = salesData.length > 0 ? totalSales / salesData.length : 0;
+      document.getElementById('average-sales').textContent = `Average Sales per Employee: $${averageSales.toFixed(2)}`;
+    }
+
+    document.getElementById('filter-sales').addEventListener('click', function () {
+      const filterId = document.getElementById('filter-employee-id').value;
+
+      if (filterId) {
+        const filteredData = salesData.filter(sale => sale.id === filterId);
+        updateSalesTable(filteredData);
+        document.getElementById('sales-count').textContent = `Total Sales for Selected Employee: $${filteredData.reduce((total, sale) => total + sale.sales, 0).toFixed(2)}`;
+      } else {
+        updateSalesTable();
+        document.getElementById('sales-count').textContent = 'Total Sales for Selected Employee: 0';
+      }
+    });
+
+    function clearFormFields() {
+      document.getElementById('employee-name').value = '';
+      document.getElementById('employee-id').value = '';
+      document.getElementById('sale-date').value = '';
+      document.getElementById('store-id').value = '';
+      document.getElementById('sales-amount').value = '';
+    }
+
+    document.getElementById('download-csv').addEventListener('click', function () {
+      const csvContent = "data:text/csv;charset=utf-8,"
+        + "Employee Name,Employee ID,Date of Sale,Store ID,Sales Amount,Performance Rating\n"
+        + salesData.map(sale => `${sale.name},${sale.id},${sale.date},${sale.storeId},${sale.sales},${sale.performance}`).join("\n");
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "sales_data.csv");
+      link.click();
+    });
+
+  </script>
+</body>
+</html>
